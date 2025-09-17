@@ -85,14 +85,41 @@ npm run test:watch
 npm run test:report
 ```
 
-### Deployment Dependencies
+### Deployment
+
+#### Testnet Deployment (Successful ✅)
+
+All contracts have been successfully deployed to Stacks testnet with v2 naming:
+
+- **bridge-adapter-trait-v2**: `ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS.bridge-adapter-trait-v2`
+- **roles-v2**: `ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS.roles-v2`
+- **sip-010-trait-v2**: `ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS.sip-010-trait-v2`
+- **strategy-registry-v2**: `ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS.strategy-registry-v2`
+- **ystx-token-v2**: `ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS.ystx-token-v2`
+- **vault-v2**: `ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS.vault-v2`
+
+#### Deployment Commands
+
+```bash
+# Generate deployment plan for testnet
+clarinet deployments generate --testnet --high-cost
+
+# Deploy to testnet
+clarinet deployments apply --testnet --no-dashboard --use-computed-deployment-plan
+
+# Check deployment status
+# Visit: https://explorer.stacks.co/address/ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS?chain=testnet
+```
+
+#### Deployment Dependencies
 
 The contracts must be deployed in this order:
-1. `roles.clar`
-2. `ystx-token.clar` 
-3. `strategy-registry.clar`
-4. `bridge-adapter-trait.clar`
-5. `vault.clar`
+1. `bridge-adapter-trait.clar`
+2. `roles.clar`
+3. `sip-010-trait.clar`
+4. `strategy-registry.clar` 
+5. `ystx-token.clar`
+6. `vault.clar`
 
 ## Public Functions
 

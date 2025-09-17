@@ -29,31 +29,34 @@
 (define-data-var tvl-cap (optional uint) none)
 
 ;; Contract addresses
-(define-data-var ystx-token-contract principal .ystx-token)
-(define-data-var roles-contract principal .roles)
-(define-data-var strategy-registry-contract principal .strategy-registry)
+(define-data-var ystx-token-contract principal .ystx-token-v3)
+(define-data-var roles-contract principal .roles-v3)
+(define-data-var strategy-registry-contract principal .strategy-registry-v3)
 (define-data-var bridge-adapter (optional principal) none)
 
 ;; Private functions
 
 ;; Check if caller is admin
 (define-private (is-admin-caller)
-  (contract-call? .roles is-admin tx-sender)
+  (contract-call? .roles-v3 is-admin tx-sender)
 )
 
 ;; Check if caller is keeper
 (define-private (is-keeper-caller)
-  (contract-call? .roles is-keeper tx-sender)
+  (contract-call? .roles-v3 is-keeper tx-sender)
 )
 
 ;; Check if contract is paused
 (define-private (is-paused)
-  (contract-call? .roles is-contract-paused)
+  (contract-call? .roles-v3 is-contract-paused)
 )
 
 ;; Assert not paused
 (define-private (assert-not-paused)
-  (asserts! (not (is-paused)) ERR_PAUSED)
+  (begin
+    (asserts! (not (is-paused)) ERR_PAUSED)
+    (ok true)
+  )
 )
 
 ;; Calculate shares to mint for deposit
@@ -151,7 +154,7 @@
 ;; Get user balance and estimated value
 (define-read-only (get-user-balance (user principal))
   (let (
-    (user-shares (unwrap-panic (contract-call? .ystx-token get-balance user)))
+    (user-shares (unwrap-panic (contract-call? .ystx-token-v3 get-balance user)))
   )
     {
       shares: user-shares,
@@ -169,7 +172,7 @@
     (shares-to-mint (calculate-deposit-shares fee-adjusted-amount))
     (new-total-underlying (+ (var-get total-underlying) fee-adjusted-amount))
   )
-    (assert-not-paused)
+    (try! (assert-not-paused))
     (asserts! (> amount u0) ERR_ZERO_AMOUNT)
     (asserts! (> shares-to-mint u0) ERR_ZERO_SHARES)
     
@@ -187,7 +190,7 @@
     (var-set total-shares (+ (var-get total-shares) shares-to-mint))
     
     ;; Mint ySTX tokens to user
-    (try! (contract-call? .ystx-token mint shares-to-mint tx-sender))
+    (try! (contract-call? .ystx-token-v3 mint shares-to-mint tx-sender))
     
     ;; Emit event
     (print {
@@ -208,13 +211,13 @@
     (gross-amount (calculate-withdraw-amount shares))
     (net-amount (apply-fee gross-amount (var-get withdraw-fee-bps)))
   )
-    (assert-not-paused)
+    (try! (assert-not-paused))
     (asserts! (> shares u0) ERR_ZERO_SHARES)
     (asserts! (> gross-amount u0) ERR_ZERO_AMOUNT)
     (asserts! (<= gross-amount (var-get total-underlying)) ERR_NO_FUNDS)
     
     ;; Burn ySTX tokens from user
-    (try! (contract-call? .ystx-token burn shares tx-sender))
+    (try! (contract-call? .ystx-token-v3 burn shares tx-sender))
     
     ;; Update vault state
     (var-set total-underlying (- (var-get total-underlying) gross-amount))
@@ -271,7 +274,7 @@
 )
   (begin
     (asserts! (is-keeper-caller) ERR_NOT_KEEPER)
-    (asserts! (contract-call? .strategy-registry validate-strategy to-chain to-proto amount) ERR_STRATEGY_NOT_ALLOWED)
+    (asserts! (contract-call? .strategy-registry-v3 validate-strategy to-chain to-proto amount) ERR_STRATEGY_NOT_ALLOWED)
     
     (print {
       topic: "event-strategy-change-requested",

@@ -1,0 +1,53 @@
+---
+id: 0
+name: Testnet deployment
+network: testnet
+stacks-node: "https://api.testnet.hiro.so"
+bitcoin-node: "http://blockstack:blockstacksystem@bitcoind.testnet.stacks.co:18332"
+plan:
+  batches:
+    - id: 0
+      transactions:
+        - contract-publish:
+            contract-name: bridge-adapter-trait-v3
+            expected-sender: ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS
+            cost: 23360
+            path: contracts/bridge-adapter-trait.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: roles-v3
+            expected-sender: ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS
+            cost: 45660
+            path: contracts/roles.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: sip-010-trait-v3
+            expected-sender: ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS
+            cost: 8300
+            path: contracts/sip-010-trait.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: strategy-registry-v3
+            expected-sender: ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS
+            cost: 91990
+            path: contracts/strategy-registry.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: ystx-token-v3
+            expected-sender: ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS
+            cost: 29660
+            path: contracts/ystx-token.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: vault-v3
+            expected-sender: ST3QYJZBWBZAJA69WSJDGMHRQ4FAGPY9QH15TJJJS
+            cost: 120460
+            path: contracts/vault.clar
+            anchor-block-only: true
+            clarity-version: 3
+      epoch: "3.2"

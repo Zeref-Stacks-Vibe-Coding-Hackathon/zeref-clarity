@@ -12,7 +12,7 @@
 (define-constant ERR_INVALID_PARAMETERS (err u104))
 
 ;; Data Variables
-(define-data-var roles-contract principal .roles)
+(define-data-var roles-contract principal .roles-v3)
 
 ;; Strategy Data Structure
 (define-map strategies 
@@ -54,7 +54,7 @@
 
 ;; Check if caller is admin via roles contract
 (define-private (is-admin-caller)
-  (contract-call? .roles is-admin tx-sender)
+  (contract-call? .roles-v3 is-admin tx-sender)
 )
 
 ;; Get current block height
@@ -65,23 +65,23 @@
 ;; Read-only functions
 
 ;; Get strategy details
-(define-read-only (get-strategy (chain-id uint) (proto-id uint))
-  (map-get? strategies {strategy-chain-id: chain-id, strategy-proto-id: proto-id})
+(define-read-only (get-strategy (chain-identifier uint) (proto-identifier uint))
+  (map-get? strategies {strategy-chain-id: chain-identifier, strategy-proto-id: proto-identifier})
 )
 
 ;; Get strategy metadata
-(define-read-only (get-strategy-metadata (chain-id uint) (proto-id uint))
-  (map-get? strategy-metadata {strategy-chain-id: chain-id, strategy-proto-id: proto-id})
+(define-read-only (get-strategy-metadata (chain-identifier uint) (proto-identifier uint))
+  (map-get? strategy-metadata {strategy-chain-id: chain-identifier, strategy-proto-id: proto-identifier})
 )
 
 ;; Check if strategy exists
-(define-read-only (strategy-exists (chain-id uint) (proto-id uint))
-  (is-some (get-strategy chain-id proto-id))
+(define-read-only (strategy-exists (chain-identifier uint) (proto-identifier uint))
+  (is-some (get-strategy chain-identifier proto-identifier))
 )
 
 ;; Check if strategy is enabled
-(define-read-only (is-strategy-enabled (chain-id uint) (proto-id uint))
-  (match (get-strategy chain-id proto-id)
+(define-read-only (is-strategy-enabled (chain-identifier uint) (proto-identifier uint))
+  (match (get-strategy chain-identifier proto-identifier)
     strategy (get enabled strategy)
     false
   )
@@ -123,8 +123,8 @@
 
 ;; Add new strategy (only admin)
 (define-public (add-strategy 
-  (chain-id uint) 
-  (proto-id uint) 
+  (chain-identifier uint) 
+  (proto-identifier uint) 
   (name (buff 32)) 
   (addr (optional principal))
   (min-amount uint)
@@ -132,17 +132,17 @@
   (fee-bps uint)
 )
   (let (
-    (strategy-key {strategy-chain-id: chain-id, strategy-proto-id: proto-id})
+    (strategy-key {strategy-chain-id: chain-identifier, strategy-proto-id: proto-identifier})
     (current-height (get-current-height))
   )
     (asserts! (is-admin-caller) ERR_NOT_AUTHORIZED)
-    (asserts! (> chain-id u0) ERR_INVALID_PARAMETERS)
-    (asserts! (> proto-id u0) ERR_INVALID_PARAMETERS)
+    (asserts! (> chain-identifier u0) ERR_INVALID_PARAMETERS)
+    (asserts! (> proto-identifier u0) ERR_INVALID_PARAMETERS)
     (asserts! (< fee-bps u10000) ERR_INVALID_PARAMETERS)
-    (asserts! (not (strategy-exists chain-id proto-id)) ERR_STRATEGY_ALREADY_EXISTS)
+    (asserts! (not (strategy-exists chain-identifier proto-identifier)) ERR_STRATEGY_ALREADY_EXISTS)
     
     ;; Add strategy
-    (map-set strategies {strategy-chain-id: chain-id, strategy-proto-id: proto-id} {
+    (map-set strategies {strategy-chain-id: chain-identifier, strategy-proto-id: proto-identifier} {
       name: name,
       addr: addr,
       enabled: true,
@@ -160,8 +160,8 @@
     ;; Emit event
     (print {
       topic: "strategy-added",
-      chain-id: chain-id,
-      proto-id: proto-id,
+      chain-id: chain-identifier,
+      proto-id: proto-identifier,
       name: name,
       enabled: true,
       by: tx-sender
@@ -173,8 +173,8 @@
 
 ;; Update strategy metadata (only admin)
 (define-public (set-strategy-metadata
-  (chain-id uint)
-  (proto-id uint)
+  (chain-identifier uint)
+  (proto-identifier uint)
   (description (buff 256))
   (website (buff 128))
   (logo-url (buff 256))
@@ -183,10 +183,10 @@
 )
   (begin
     (asserts! (is-admin-caller) ERR_NOT_AUTHORIZED)
-    (asserts! (strategy-exists chain-id proto-id) ERR_STRATEGY_NOT_FOUND)
+    (asserts! (strategy-exists chain-identifier proto-identifier) ERR_STRATEGY_NOT_FOUND)
     (asserts! (<= risk-level u5) ERR_INVALID_PARAMETERS)
     
-    (map-set strategy-metadata {strategy-chain-id: chain-id, strategy-proto-id: proto-id} {
+    (map-set strategy-metadata {strategy-chain-id: chain-identifier, strategy-proto-id: proto-identifier} {
       description: description,
       website: website,
       logo-url: logo-url,
@@ -196,8 +196,8 @@
     
     (print {
       topic: "strategy-metadata-updated",
-      chain-id: chain-id,
-      proto-id: proto-id,
+      chain-id: chain-identifier,
+      proto-id: proto-identifier,
       by: tx-sender
     })
     
@@ -206,10 +206,10 @@
 )
 
 ;; Enable strategy (only admin)
-(define-public (enable-strategy (chain-id uint) (proto-id uint))
+(define-public (enable-strategy (chain-identifier uint) (proto-identifier uint))
   (let (
-    (strategy-key {strategy-chain-id: chain-id, strategy-proto-id: proto-id})
-    (current-strategy (unwrap! (get-strategy chain-id proto-id) ERR_STRATEGY_NOT_FOUND))
+    (strategy-key {strategy-chain-id: chain-identifier, strategy-proto-id: proto-identifier})
+    (current-strategy (unwrap! (get-strategy chain-identifier proto-identifier) ERR_STRATEGY_NOT_FOUND))
   )
     (asserts! (is-admin-caller) ERR_NOT_AUTHORIZED)
     
@@ -220,8 +220,8 @@
     
     (print {
       topic: "strategy-enabled",
-      chain-id: chain-id,
-      proto-id: proto-id,
+      chain-id: chain-identifier,
+      proto-id: proto-identifier,
       by: tx-sender
     })
     
@@ -230,10 +230,10 @@
 )
 
 ;; Disable strategy (only admin)
-(define-public (disable-strategy (chain-id uint) (proto-id uint))
+(define-public (disable-strategy (chain-identifier uint) (proto-identifier uint))
   (let (
-    (strategy-key {strategy-chain-id: chain-id, strategy-proto-id: proto-id})
-    (current-strategy (unwrap! (get-strategy chain-id proto-id) ERR_STRATEGY_NOT_FOUND))
+    (strategy-key {strategy-chain-id: chain-identifier, strategy-proto-id: proto-identifier})
+    (current-strategy (unwrap! (get-strategy chain-identifier proto-identifier) ERR_STRATEGY_NOT_FOUND))
   )
     (asserts! (is-admin-caller) ERR_NOT_AUTHORIZED)
     
@@ -244,8 +244,8 @@
     
     (print {
       topic: "strategy-disabled", 
-      chain-id: chain-id,
-      proto-id: proto-id,
+      chain-id: chain-identifier,
+      proto-id: proto-identifier,
       by: tx-sender
     })
     
@@ -255,15 +255,15 @@
 
 ;; Update strategy parameters (only admin)
 (define-public (update-strategy-params
-  (chain-id uint)
-  (proto-id uint)
+  (chain-identifier uint)
+  (proto-identifier uint)
   (min-amount uint)
   (max-amount uint)
   (fee-bps uint)
 )
   (let (
-    (strategy-key {strategy-chain-id: chain-id, strategy-proto-id: proto-id})
-    (current-strategy (unwrap! (get-strategy chain-id proto-id) ERR_STRATEGY_NOT_FOUND))
+    (strategy-key {strategy-chain-id: chain-identifier, strategy-proto-id: proto-identifier})
+    (current-strategy (unwrap! (get-strategy chain-identifier proto-identifier) ERR_STRATEGY_NOT_FOUND))
   )
     (asserts! (is-admin-caller) ERR_NOT_AUTHORIZED)
     (asserts! (< fee-bps u10000) ERR_INVALID_PARAMETERS)
@@ -278,8 +278,8 @@
     
     (print {
       topic: "strategy-params-updated",
-      chain-id: chain-id,
-      proto-id: proto-id,
+      chain-id: chain-identifier,
+      proto-id: proto-identifier,
       min-amount: min-amount,
       max-amount: max-amount,
       fee-bps: fee-bps,
@@ -291,8 +291,8 @@
 )
 
 ;; Validate strategy for use (used by vault)
-(define-read-only (validate-strategy (chain-id uint) (proto-id uint) (amount uint))
-  (match (get-strategy chain-id proto-id)
+(define-read-only (validate-strategy (chain-identifier uint) (proto-identifier uint) (amount uint))
+  (match (get-strategy chain-identifier proto-identifier)
     strategy (and
       (get enabled strategy)
       (>= amount (get min-amount strategy))

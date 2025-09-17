@@ -2,7 +2,7 @@
 ;; This contract implements a fungible token that represents shares in the LoopFi Vault
 
 ;; SIP-010 Trait
-(impl-trait .sip-010-trait.sip-010-trait)
+(impl-trait .sip-010-trait-v3.sip-010-trait)
 
 ;; Constants
 (define-constant CONTRACT_OWNER tx-sender)

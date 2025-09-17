@@ -5,29 +5,29 @@ authors = []
 telemetry = true
 cache_dir = "./.cache"
 
-[contracts.sip-010-trait]
+[contracts.sip-010-trait-v3]
 path = "contracts/sip-010-trait.clar"
 epoch = "latest"
 
-[contracts.roles]
+[contracts.roles-v3]
 path = "contracts/roles.clar"
 epoch = "latest"
 
-[contracts.ystx-token]
+[contracts.ystx-token-v3]
 path = "contracts/ystx-token.clar"
 epoch = "latest"
 
-[contracts.bridge-adapter-trait]
+[contracts.bridge-adapter-trait-v3]
 path = "contracts/bridge-adapter-trait.clar"
 epoch = "latest"
 
-# [contracts.strategy-registry]
-# path = "contracts/strategy-registry.clar" 
-# epoch = "latest"
+[contracts.strategy-registry-v3]
+path = "contracts/strategy-registry.clar" 
+epoch = "latest"
 
-# [contracts.vault]
-# path = "contracts/vault.clar"
-# epoch = "latest"
+[contracts.vault-v3]
+path = "contracts/vault.clar"
+epoch = "latest"
 
 [repl.analysis]
 passes = ["check_checker"]

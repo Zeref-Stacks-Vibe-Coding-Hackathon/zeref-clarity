@@ -1,0 +1,53 @@
+---
+id: 0
+name: Devnet deployment
+network: devnet
+stacks-node: "http://localhost:20443"
+bitcoin-node: "http://devnet:devnet@localhost:18443"
+plan:
+  batches:
+    - id: 0
+      transactions:
+        - contract-publish:
+            contract-name: bridge-adapter-trait-v2
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 23360
+            path: contracts/bridge-adapter-trait.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: roles-v2
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 45660
+            path: contracts/roles.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: sip-010-trait-v2
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 8300
+            path: contracts/sip-010-trait.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: strategy-registry-v2
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 91990
+            path: contracts/strategy-registry.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: ystx-token-v2
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 29660
+            path: contracts/ystx-token.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: vault-v2
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 120460
+            path: contracts/vault.clar
+            anchor-block-only: true
+            clarity-version: 3
+      epoch: "3.2"
