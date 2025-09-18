@@ -1,4 +1,4 @@
-# LoopFi Vault - Cross-Chain Yield Looping MVP
+# Zeref Vault - Cross-Chain Yield Looping MVP
 
 A production-ready Clarity contract suite for cross-chain yield looping on Stacks. Users deposit STX and receive ySTX receipt tokens, while off-chain resolvers and relayers handle cross-chain strategy execution.
 
